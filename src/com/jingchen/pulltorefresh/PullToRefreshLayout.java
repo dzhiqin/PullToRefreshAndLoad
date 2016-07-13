@@ -30,81 +30,148 @@ import com.jingchen.pulltorefresh.pullableview.Pullable;
 public class PullToRefreshLayout extends RelativeLayout
 {
 	public static final String TAG = "PullToRefreshLayout";
-	// 初始状态
+	/**
+	 * // 初始状态
+	 */
 	public static final int INIT = 0;
-	// 释放刷新
+	/**
+	 * // 释放刷新
+	 */
 	public static final int RELEASE_TO_REFRESH = 1;
-	// 正在刷新
+	/**
+	 * // 正在刷新
+	 */
 	public static final int REFRESHING = 2;
-	// 释放加载
+	/**
+	 * 	// 释放加载
+	 */
 	public static final int RELEASE_TO_LOAD = 3;
-	// 正在加载
+	/**
+	 * // 正在加载
+	 */
 	public static final int LOADING = 4;
-	// 操作完毕
+	/**
+	 * // 操作完毕
+	 */
 	public static final int DONE = 5;
-	// 当前状态
+	/**
+	 * // 当前状态
+	 */
 	private int state = INIT;
-	// 刷新回调接口
+	/**
+	 * // 刷新回调接口
+	 */
 	private OnRefreshListener mListener;
-	// 刷新成功
+	/**
+	 * // 刷新成功
+	 */
 	public static final int SUCCEED = 0;
-	// 刷新失败
+	/**
+	 * // 刷新失败
+	 */
 	public static final int FAIL = 1;
-	// 按下Y坐标，上一个事件点Y坐标
+	/**
+	 * // 按下Y坐标，上一个事件点Y坐标
+	 */
 	private float downY, lastY;
 
-	// 下拉的距离。注意：pullDownY和pullUpY不可能同时不为0
+	/**
+	 * // 下拉的距离。注意：pullDownY和pullUpY不可能同时不为0
+	 */
 	public float pullDownY = 0;
-	// 上拉的距离
+	/**
+	 * // 上拉的距离
+	 */
 	private float pullUpY = 0;
 
-	// 释放刷新的距离
+	/**
+	 * // 释放刷新的距离
+	 */
 	private float refreshDist = 200;
-	// 释放加载的距离
+	/**
+	 * // 释放加载的距离
+	 */
 	private float loadmoreDist = 200;
 
 	private MyTimer timer;
-	// 回滚速度
+	/**
+	 * // 回滚速度
+	 */
 	public float MOVE_SPEED = 8;
-	// 第一次执行布局
+	/**
+	 * // 第一次执行布局
+	 */
 	private boolean isLayout = false;
-	// 在刷新过程中滑动操作
+	/**
+	 * // 在刷新过程中滑动操作
+	 */
 	private boolean isTouch = false;
-	// 手指滑动距离与下拉头的滑动距离比，中间会随正切函数变化
+	/**
+	 * // 手指滑动距离与下拉头的滑动距离比，中间会随正切函数变化
+	 */
 	private float radio = 2;
 
-	// 下拉箭头的转180°动画
+	/**
+	 * // 下拉箭头的转180°动画
+	 */
 	private RotateAnimation rotateAnimation;
-	// 均匀旋转动画
+	/**
+	 * // 均匀旋转动画
+	 */
 	private RotateAnimation refreshingAnimation;
-
-	// 下拉头
-	private View refreshView;
-	// 下拉的箭头
+	/**
+	 * 下拉头
+	 */
+	private View refreshView;	
+	/**
+	 * 下拉的箭头
+	 */	
 	private View pullView;
-	// 正在刷新的图标
+	/**
+	 * // 正在刷新的图标
+	 */
 	private View refreshingView;
-	// 刷新结果图标
+	// 
+	/**
+	 * 刷新结果图标
+	 */
 	private View refreshStateImageView;
-	// 刷新结果：成功或失败
+	/**
+	 * 刷新结果：成功或失败
+	 */
 	private TextView refreshStateTextView;
-
-	// 上拉头
+	/**
+	 * // 上拉头
+	 */
 	private View loadmoreView;
-	// 上拉的箭头
+	/**
+	 * 	// 上拉的箭头
+	 */
 	private View pullUpView;
-	// 正在加载的图标
+	/**
+	 * // 正在加载的图标
+	 */
 	private View loadingView;
-	// 加载结果图标
+	/**
+	 * // 加载结果图标
+	 */
 	private View loadStateImageView;
-	// 加载结果：成功或失败
+	/**
+	 * // 加载结果：成功或失败
+	 */
 	private TextView loadStateTextView;
 
-	// 实现了Pullable接口的View
+	/**
+	 * // 实现了Pullable接口的View
+	 */
 	private View pullableView;
-	// 过滤多点触碰
+	/**
+	 * // 过滤多点触碰
+	 */
 	private int mEvents;
-	// 这两个变量用来控制pull的方向，如果不加控制，当情况满足可上拉又可下拉时没法下拉
+	/**
+	 * // 这两个变量用来控制pull的方向，如果不加控制，当情况满足可上拉又可下拉时没法下拉
+	 */
 	private boolean canPullDown = true;
 	private boolean canPullUp = true;
 
@@ -214,12 +281,11 @@ public class PullToRefreshLayout extends RelativeLayout
 		timer.schedule(5);
 	}
 
-	/**
-	 * 完成刷新操作，显示刷新结果。注意：刷新完成后一定要调用这个方法
-	 */
+	
 	/**
 	 * @param refreshResult
 	 *            PullToRefreshLayout.SUCCEED代表成功，PullToRefreshLayout.FAIL代表失败
+	 *            完成刷新操作，显示刷新结果。注意：刷新完成后一定要调用这个方法
 	 */
 	public void refreshFinish(int refreshResult)
 	{
@@ -365,7 +431,7 @@ public class PullToRefreshLayout extends RelativeLayout
 		canPullUp = true;
 	}
 
-	/*
+	/**
 	 * （非 Javadoc）由父控件决定是否分发事件，防止事件冲突
 	 * 
 	 * @see android.view.ViewGroup#dispatchTouchEvent(android.view.MotionEvent)
